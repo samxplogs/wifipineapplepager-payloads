@@ -5,11 +5,11 @@
 ---
 
 ### Features
+* **New Headless Mode:** Use Log Viewer to parse your log file and output to the console right from your payload!
 * **Turbo Batching:** Renders 50+ lines of log data instantly using compiled buffers.
 * **Dual View Modes:** Choose between **Parsed** (Deconstructed Color) or **Raw** (Standard Text).
 * **D-Pad Navigation:** Vertical up/down scrolling of log files for easier access.
 * **Large File Safety:** Automatically detects massive files and offers to "Tail" (view the last 60 lines) to prevent device freezing.
-
 ---
 
 ### Workflow Tutorial
@@ -56,24 +56,63 @@ The tool compiles the render script. Press **OK** to generate the view.
 The log is displayed on screen.
 * **Yellow:** Timestamp
 * **Blue:** IP or MAC Address
-* **Green/Red:** Username/Password
+* **Green/Red:** Status (Success/Failure)
 * **White:** General Info
 
 ![Final View](screens/Capture_08.png)
 
 ---
 
-### Log Format
-The tool parses standard text logs found in `/root/loot`. The Deconstruction Engine breaks them down visually. Below is an example of an Nmap scan result:
+## Integration / Headless Usage
 
-```text
-TIME: 11:21:44
-ADDR: 192.168.50.5
-INFO: # Nmap 7.95 scan initiated Tue Dec 23 2025
-as: nmap -Pn -sS -F -oA
-/root/loot/nmapTarget/2025-12-23T11:21:37-05:00
-/24
----
-ADDR: 192.168.50.1
-INFO: Host: () Status: Up
----
+You can call the Log Viewer from any other script (like Blue Clues or Counter Snoop) by passing arguments directly.
+
+### Arguments
+
+| Position | Argument | Description | Options |
+| :--- | :--- | :--- | :--- |
+| **$1** | `File Path` | Absolute path to the log file. | `/root/loot/scan.txt` |
+| **$2** | `Mode` | How the log should be rendered. | `1` = **Parsed** (Color)<br>`2` = **Raw** (Text) |
+
+### Example Command
+
+To open a specific log file immediately in **Color Mode**:
+
+```bash
+/root/payloads/user/general/log_viewer/payload.sh "/root/loot/blue_clues/scan_results.txt" 1
+```
+
+### Headless Examples
+
+**1. Basic Integration (Standard)**
+Use this to automatically launch the viewer at the end of a script.
+
+```bash
+# === ADD TO END OF PAYLOAD ===
+VIEWER="/root/payloads/user/general/log_viewer/payload.sh"
+
+if [ -f "$VIEWER" ]; then
+    # Launch in Parsed/Color Mode (1)
+    /bin/bash "$VIEWER" "$LOG_FILE" 1
+fi
+```
+
+**2. Interactive Choice**
+
+```
+# === ADD TO END OF PAYLOAD ===
+VIEWER="/root/payloads/user/general/log_viewer/payload.sh"
+
+PROMPT "SCAN COMPLETE
+
+1. View Log Now
+2. Exit
+
+Press OK."
+CHOICE=$(NUMBER_PICKER "Select Option" 1)
+
+if [ "$CHOICE" -eq 1 ] && [ -f "$VIEWER" ]; then
+    /bin/bash "$VIEWER" "$LOG_FILE" 1
+fi
+```
+

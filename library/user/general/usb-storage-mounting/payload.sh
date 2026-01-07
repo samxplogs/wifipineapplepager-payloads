@@ -15,8 +15,8 @@ DEVICE=$(blkid | grep -o '/dev/sd[a-z][0-9]\+' | head -n 1)
 # Check if a USB device was found
 if [ -z "$DEVICE" ]; then
     echo "No USB storage device detected."
-    LOG "No USB device found"
-    exit 1
+    ERROR_DIALOG "No USB device found"
+    exit 0
 fi
 
 # Check if device is already mounted
@@ -34,3 +34,4 @@ else
     }
 
 fi
+

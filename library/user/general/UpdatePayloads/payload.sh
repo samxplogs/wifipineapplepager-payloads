@@ -2,7 +2,7 @@
 # Title: Update Payloads
 # Description: Downloads and syncs all payloads from github.
 # Author: cococode
-# Version: 1.3
+# Version: 1.4
 
 # === CONFIGURATION ===
 GH_ORG="hak5"
@@ -12,9 +12,6 @@ GH_BRANCH="master"
 ZIP_URL="https://github.com/$GH_ORG/$GH_REPO/archive/refs/heads/$GH_BRANCH.zip"
 TARGET_DIR="/mmc/root/payloads"
 TEMP_DIR="/tmp/pager_update"
-
-# Source Hak5 libs
-. /lib/hak5/commands.sh
 
 # === STATE ===
 BATCH_MODE=""           # "" (Interactive), "OVERWRITE", "SKIP"
@@ -68,8 +65,6 @@ process_payloads() {
         LOG "Invalid Zip Structure"
         exit 1
     fi
-
-    LOG "Processing payloads. This may take a while depending on how many upstream changes there are."
 
     # FIND STRATEGY:
     # Instead of assuming flat structure, find every 'payload.sh'
@@ -128,8 +123,8 @@ handle_conflict() {
     # === BATCH SELECTION (First Conflict Only) ===
     if [ "$FIRST_CONFLICT" = true ]; then
         LED SETUP
-        if [ "$(CONFIRMATION_DIALOG "Conflict detected. Manual Review?")" == "0" ]; then
-             if [ "$(CONFIRMATION_DIALOG "Overwrite ALL conflicts?")" == "1" ]; then
+        if [ "$(CONFIRMATION_DIALOG "Updates found! Review each updated payload?")" == "0" ]; then
+             if [ "$(CONFIRMATION_DIALOG "Overwrite ALL payloads with updated versions?")" == "1" ]; then
                 BATCH_MODE="OVERWRITE"
              else
                 BATCH_MODE="SKIP"
@@ -160,9 +155,10 @@ handle_conflict() {
     # === EXECUTION ===
     if [ "$do_overwrite" = true ]; then
         perform_safe_copy "$src" "$dst"
-        LOG "[ UPDATED ] $title"
+        LOG_BUFFER+="[ UPDATED ] $title\n"
         COUNT_UPDATED=$((COUNT_UPDATED + 1))
     else
+        LOG_BUFFER+="[ SKIPPED ] $title\n"
         COUNT_SKIPPED=$((COUNT_SKIPPED + 1))
     fi
 }
@@ -201,8 +197,8 @@ finish() {
 
     rm -rf "$TEMP_DIR"
 
-    LOG "$LOG_BUFFER"
-    LOG "Done: $COUNT_NEW New, $COUNT_UPDATED Upd, $COUNT_SKIPPED Skip"
+    LOG "\n$LOG_BUFFER"
+    LOG "Done: $COUNT_NEW New, $COUNT_UPDATED Updated, $COUNT_SKIPPED Skipped"
 }
 
 # === MAIN ===
