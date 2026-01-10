@@ -62,11 +62,14 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .detail .meta span{display:flex;align-items:center;gap:5px}
 .detail .meta svg{width:14px;height:14px;fill:var(--text2)}
 .detail .description{color:var(--text2);line-height:1.5;margin-bottom:16px;font-size:0.9em}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.85em;font-weight:600;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.actions{display:flex;flex-direction:column}
+.btn{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:0.85em;font-weight:600;transition:all 0.2s;display:flex;align-items:center;gap:6px;justify-content:center}
 .btn:hover{transform:translateY(-2px);box-shadow:var(--glow)}
 .btn:active{transform:translateY(0)}
 .btn.stop{background:linear-gradient(135deg,var(--danger),#ff6b81)}
+.btn-row{display:flex;gap:10px;margin-bottom:8px}
+.btn-row .btn{flex:1 1 0;min-width:0;white-space:nowrap}
+.btn-half{width:calc(50% - 5px)}
 .btn.secondary{background:transparent;border:1px solid var(--border);color:var(--text);padding:10px 16px}
 .btn.secondary:hover{border-color:var(--accent);color:var(--accent)}
 .console-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -82,20 +85,40 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .console .red{color:var(--danger)}
 .console .magenta{color:#ff6b9d}
 .console .blue{color:#54a0ff}
+.source-viewer{position:absolute;top:0;left:0;right:0;bottom:0;background:#050508;overflow:auto;padding:0;font-family:'JetBrains Mono','Fira Code','Consolas',monospace;font-size:0.75em;line-height:1.6;scrollbar-width:thin;scrollbar-color:var(--border) transparent;z-index:5}
+.source-viewer::-webkit-scrollbar{width:6px}
+.source-viewer::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.source-viewer table{border-collapse:collapse;width:100%}
+.source-viewer .line-num{padding:0 12px 0 8px;text-align:right;color:#555;user-select:none;border-right:1px solid #222;background:#0a0a0f;position:sticky;left:0;min-width:40px}
+.source-viewer .line-code{padding:0 12px;white-space:pre;color:#c9d1d9}
+.source-viewer tr:hover .line-code{background:#111118}
+.source-viewer tr:hover .line-num{background:#0f0f15;color:#888}
+.source-viewer .sh-comment{color:#6a737d;font-style:italic}
+.source-viewer .sh-string{color:#a5d6ff}
+.source-viewer .sh-keyword{color:#ff7b72}
+.source-viewer .sh-variable{color:#79c0ff}
+.source-viewer .sh-function{color:#d2a8ff}
+.console-wrap{position:relative}
 .empty{padding:40px 30px;text-align:center;color:var(--text2)}
 .empty svg{width:48px;height:48px;fill:var(--border);margin-bottom:12px}
 .empty h3{color:var(--text);margin-bottom:6px;font-weight:500;font-size:1em}
 .empty p{font-size:0.85em}
 @media(max-width:1100px){.main{flex-direction:column}.main-left{max-width:none;border-right:none;border-bottom:1px solid var(--border);max-height:200px}.main-right{flex:1;flex-direction:column}.console-panel:first-child{border-right:none;border-bottom:1px solid var(--border)}}
 @media(max-width:700px){.container{flex-direction:column}.sidebar{width:100%;max-height:35vh;border-right:none;border-bottom:1px solid var(--border)}.main{flex:1}.main-left{max-height:150px}.main-right{flex-direction:column}}
-.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:1000;backdrop-filter:blur(4px)}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:1000;backdrop-filter:blur(4px);transition:backdrop-filter 0.15s,background 0.15s}
 .modal-overlay.show{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;min-width:300px;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal-overlay.peek{backdrop-filter:none;background:rgba(0,0,0,0.3)}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;min-width:300px;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.5);transition:opacity 0.15s}
+.modal-overlay.peek .modal{opacity:0.5}
+.modal-peek-btn{position:absolute;top:8px;right:8px;background:transparent;border:none;cursor:pointer;padding:6px;border-radius:6px;opacity:0.5;transition:opacity 0.15s}
+.modal-peek-btn:hover{opacity:1}
+.modal-peek-btn svg{width:18px;height:18px;fill:var(--text2)}
+.modal{position:relative}
 .modal-title{font-size:1.1em;font-weight:600;color:var(--accent);margin-bottom:10px}
 .modal-message{color:var(--text);line-height:1.5;margin-bottom:16px;font-size:0.95em}
 .modal-input{width:100%;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1em;margin-bottom:16px}
 .modal-input:focus{outline:none;border-color:var(--accent)}
-.modal-buttons{display:flex;gap:10px;justify-content:flex-end}
+.modal-buttons{display:flex;gap:10px;justify-content:center}
 .login-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);display:flex;justify-content:center;align-items:center;z-index:2000}
 .login-overlay.hidden{display:none}
 .login-box{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:320px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
@@ -316,8 +339,9 @@ Scanning for networks...
 <div class="main-right">
 <div class="console-panel">
 <div class="console-wrap">
-<div class="console-header"><span>Nautilus Console</span><span><button onclick="clearConsole()">Clear</button> <span id="lineCount">0 lines</span></span></div>
+<div class="console-header"><span id="consoleTitle">Nautilus Console</span><span><button onclick="clearConsole()">Clear</button> <span id="lineCount">0 lines</span></span></div>
 <div class="console" id="console"></div>
+<div class="source-viewer" id="sourceViewer" style="display:none"></div>
 </div>
 </div>
 <div class="shell-panel">
@@ -329,6 +353,7 @@ Scanning for networks...
 </div>
 <div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this){if(installing){stopInstall();}$('modalOverlay').classList.remove('show');}">
 <div class="modal" onclick="event.stopPropagation()">
+<button class="modal-peek-btn" title="Hold to peek behind" onmousedown="$('modalOverlay').classList.add('peek')" onmouseup="$('modalOverlay').classList.remove('peek')" onmouseleave="$('modalOverlay').classList.remove('peek')"><svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
 <div class="modal-title" id="modalTitle">Confirm</div>
 <div class="modal-message" id="modalMessage"></div>
 <input type="text" class="modal-input" id="modalInput" style="display:none">
@@ -350,6 +375,7 @@ let payloads={},filtered={},selected=null,running=false,evtSource=null,lineCount
 let activeSpinners={};
 let currentTab='local';
 let runningSection=null;
+let viewingSource=false;
 let githubPayloads={},filteredGithub={},githubPRs=[],filteredPRs=[];
 const $=id=>document.getElementById(id);
 
@@ -630,11 +656,10 @@ function getSignalBars(signal){
   if(sig>-50)bars=4;
   else if(sig>-60)bars=3;
   else if(sig>-70)bars=2;
-  // Color based on signal strength
-  let color='#e74c3c'; // red - weak
-  if(bars>=4)color='#00ff88'; // green - excellent
-  else if(bars>=3)color='#2ecc71'; // light green - good
-  else if(bars>=2)color='#f39c12'; // orange - fair
+  let color='#e74c3c';
+  if(bars>=4)color='#00ff88';
+  else if(bars>=3)color='#2ecc71';
+  else if(bars>=2)color='#f39c12';
   const heights=[4,8,12,16];
   return heights.map((h,i)=>`<span style="height:${h}px;background:${i<bars?color:'var(--border)'};opacity:1"></span>`).join('');
 }
@@ -1014,6 +1039,7 @@ function getLabelTextColor(hexColor){
 
 function selectGithubPayload(path){
   if(running&&runningSection!=='merged')stop();
+  hideSource();
   document.querySelectorAll('.payload').forEach(p=>p.classList.remove('active'));
   const el=document.querySelector('.payload[data-github-path="'+path+'"]');
   if(el)el.classList.add('active');
@@ -1023,7 +1049,8 @@ function selectGithubPayload(path){
       selected={...found,isGithub:true};
       const authorHtml=found.author?'<span><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'+escHtml(found.author)+'</span>':'';
       const versionHtml=found.version?'<span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>v'+escHtml(found.version)+'</span>':'';
-      $('detail').innerHTML='<h2>'+escHtml(found.title)+'</h2><div class="meta">'+authorHtml+versionHtml+'<span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>GitHub</span></div><div class="description">'+escHtml(found.description||'No description')+'</div><div class="actions"><button class="btn" id="runBtn" onclick="runGithub()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Run from GitHub</button><button class="btn secondary" id="installBtn" onclick="installGithub()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Install Locally</button></div>';
+      const ghUrl='https://github.com/'+GITHUB_REPO+'/tree/'+GITHUB_BRANCH+'/'+found.path;
+      $('detail').innerHTML='<h2>'+escHtml(found.title)+'</h2><div class="meta">'+authorHtml+versionHtml+'<span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>GitHub</span></div><div class="description">'+escHtml(found.description||'No description')+'</div><a href="'+ghUrl+'" target="_blank" class="btn secondary" style="width:100%;margin-bottom:8px"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>View on GitHub</a><div class="actions"><div class="btn-row"><button class="btn" id="runBtn" onclick="runGithub()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="runBtnText">Run Payload</span></button><button class="btn secondary" id="sourceBtn" onclick="toggleSource()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg><span id="sourceBtnText">View Source</span></button></div><button class="btn secondary btn-half" id="installBtn" onclick="installGithub()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Install Locally</button></div>';
       updateRunBtn();
       updateInstallBtn();
       break;
@@ -1033,10 +1060,11 @@ function selectGithubPayload(path){
 
 function selectPR(number){
   if(running&&runningSection!=='pr')stop();
+  hideSource();
   const pr=githubPRs.find(p=>p.number===number);
   if(!pr)return;
   selected={...pr,isPR:true};
-  $('detail').innerHTML='<h2><span style="color:var(--accent)">#'+pr.number+'</span> '+escHtml(pr.title)+'</h2><div class="meta"><span><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'+escHtml(pr.user)+'</span><span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>'+escHtml(pr.branch)+'</span></div><div class="description">Pull Request from '+escHtml(pr.user)+'</div><div class="actions"><a href="'+escHtml(pr.url)+'" target="_blank" class="btn secondary">View on GitHub</a><button class="btn" onclick="loadPRPayloads('+pr.number+')">Load Payloads</button></div>';
+  $('detail').innerHTML='<h2><span style="color:var(--accent)">#'+pr.number+'</span> '+escHtml(pr.title)+'</h2><div class="meta"><span><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'+escHtml(pr.user)+'</span><span><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>'+escHtml(pr.branch)+'</span></div><div class="description">Pull Request from '+escHtml(pr.user)+'</div><a href="'+escHtml(pr.url)+'" target="_blank" class="btn secondary" style="width:100%;margin-bottom:8px"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>View on GitHub</a><button class="btn" style="width:100%" onclick="loadPRPayloads('+pr.number+')"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Load Payloads</button>';
 }
 
 function getPRFilesCache(){
@@ -1101,7 +1129,7 @@ async function loadPRPayloads(number){
     const name=f.filename.split('/').slice(-2,-1)[0]||f.filename;
     html+='<div class="payload pr-payload" data-pr-sha="'+escHtml(pr.sha)+'" data-pr-file="'+escHtml(f.filename)+'" style="margin:4px 0" onclick="selectPRPayload(this,\''+escHtml(pr.sha)+'\',\''+escHtml(f.filename)+'\',\''+escHtml(name)+'\',\''+escHtml(forkRepo)+'\')"><div class="name">'+escHtml(name)+'</div><div class="desc">'+escHtml(f.filename)+'</div></div>';
   }
-  html+='</div><div id="prPayloadActions" style="display:none;margin-top:12px"><button class="btn" id="runBtn" onclick="runSelectedPRPayload()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Run Payload</button><button class="btn secondary" id="installPRBtn" onclick="installSelectedPRPayload()" style="margin-left:10px"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Install Locally</button></div>';
+  html+='</div><div id="prPayloadActions" style="display:none;margin-top:12px"><div class="btn-row"><button class="btn" id="runBtn" onclick="runSelectedPRPayload()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="runBtnText">Run Payload</span></button><button class="btn secondary" id="sourceBtn" onclick="togglePRSource()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg><span id="prSourceBtnText">View Source</span></button></div><button class="btn secondary btn-half" id="installPRBtn" onclick="installSelectedPRPayload()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>Install Locally</button></div>';
   $('detail').innerHTML+=html;
   updateRunBtn();
 }
@@ -1109,6 +1137,7 @@ async function loadPRPayloads(number){
 async function runGithub(){
   if(!selected||!selected.isGithub)return;
   if(running){stop();return;}
+  hideSource();
   running=true;runningSection='merged';lineCount=0;
   updateRunBtn();
   $('console').innerHTML='';
@@ -1179,6 +1208,7 @@ async function runGithub(){
 let selectedPRPayload=null;
 
 function selectPRPayload(el,sha,filename,name,forkRepo){
+  hideSource();
   document.querySelectorAll('.pr-payload').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
   selectedPRPayload={sha,filename,name,forkRepo:forkRepo||GITHUB_REPO};
@@ -1197,8 +1227,57 @@ function installSelectedPRPayload(){
   installPRPayload(selectedPRPayload.sha,selectedPRPayload.filename,selectedPRPayload.name,selectedPRPayload.forkRepo);
 }
 
+async function togglePRSource(){
+  if(!selectedPRPayload)return;
+
+  if(viewingSource){
+    hideSource();
+    const btn=$('prSourceBtnText');
+    if(btn)btn.textContent='View Source';
+    return;
+  }
+
+  const repo=selectedPRPayload.forkRepo||GITHUB_REPO;
+  const rawUrl=`${GITHUB_RAW}/${repo}/${selectedPRPayload.sha}/${selectedPRPayload.filename}`;
+
+  $('consoleTitle').textContent='Loading source...';
+
+  try{
+    const resp=await fetch(rawUrl);
+    if(!resp.ok)throw new Error('Failed to fetch from GitHub');
+    const content=await resp.text();
+
+    const lines=content.split('\n');
+    let html='<table>';
+    for(let i=0;i<lines.length;i++){
+      const lineNum=i+1;
+      const highlighted=highlightSh(lines[i]);
+      html+='<tr><td class="line-num">'+lineNum+'</td><td class="line-code">'+highlighted+'</td></tr>';
+    }
+    html+='</table>';
+
+    $('sourceViewer').innerHTML=html;
+    $('sourceViewer').style.display='';
+    $('console').style.display='none';
+    $('consoleTitle').textContent='Source: '+selectedPRPayload.name;
+    viewingSource=true;
+
+    const btn=$('prSourceBtnText');
+    if(btn)btn.textContent='Hide Source';
+  }catch(e){
+    $('consoleTitle').textContent='Nautilus Console';
+    const line=document.createElement('div');
+    line.className='line red';
+    line.textContent='[Source] Error: '+e.message;
+    $('console').appendChild(line);
+    lineCount++;
+    $('lineCount').textContent=lineCount+' lines';
+  }
+}
+
 async function runPRPayload(sha,filename,forkRepo){
   if(running){stop();return;}
+  hideSource();
   running=true;runningSection='pr';lineCount=0;
   updateRunBtn();
   $('console').innerHTML='';
@@ -1674,6 +1753,7 @@ function renderDetail(){
 
 function selectByPath(path){
   if(running&&runningSection!=='local')stop();
+  hideSource();
   document.querySelectorAll('.payload').forEach(p=>p.classList.remove('active'));
   const el=document.querySelector('.payload[data-path="'+path+'"]');
   if(el)el.classList.add('active');
@@ -1685,16 +1765,159 @@ function selectByPath(path){
       const desc=selected.desc?escHtml(selected.desc):'';
       const authorHtml=author?'<span><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'+author+'</span>':'';
       const descHtml=desc?'<div class="description">'+desc+'</div>':'';
-      $('detail').innerHTML='<h2>'+escHtml(selected.name)+'</h2><div class="meta">'+authorHtml+'<span><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>'+cat+'</span></div>'+descHtml+'<div class="actions"><button class="btn" id="runBtn" onclick="run()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Run Payload</button></div>';
+      const isNautilus=selected.path.includes('/remote_access/nautilus/');
+      const deleteRow=isNautilus?'':'<button class="btn secondary btn-half" id="deleteBtn" onclick="deletePayload()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>Delete</button>';
+      $('detail').innerHTML='<h2>'+escHtml(selected.name)+'</h2><div class="meta">'+authorHtml+'<span><svg viewBox="0 0 24 24"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>'+cat+'</span></div>'+descHtml+'<div class="actions"><div class="btn-row"><button class="btn" id="runBtn" onclick="run()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="runBtnText">Run Payload</span></button><button class="btn secondary" id="sourceBtn" onclick="toggleSource()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg><span id="sourceBtnText">View Source</span></button></div>'+deleteRow+'</div>';
       updateRunBtn();
       break;
     }
   }
 }
 
+function hideSource(){
+  if(!viewingSource)return;
+  viewingSource=false;
+  $('sourceViewer').style.display='none';
+  $('console').style.display='';
+  $('consoleTitle').textContent='Nautilus Console';
+  const btn=$('sourceBtnText');
+  if(btn)btn.textContent='View Source';
+  const prBtn=$('prSourceBtnText');
+  if(prBtn)prBtn.textContent='View Source';
+}
+
+function highlightSh(code){
+  return code
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/(#[^\n]*)/g,'<span class="sh-comment">$1</span>')
+    .replace(/("(?:[^"\\]|\\.)*"|'[^']*')/g,'<span class="sh-string">$1</span>')
+    .replace(/\b(if|then|else|elif|fi|for|while|do|done|case|esac|function|return|exit|local|export|source|in)\b/g,'<span class="sh-keyword">$1</span>')
+    .replace(/(\$\{?[A-Za-z_][A-Za-z0-9_]*\}?)/g,'<span class="sh-variable">$1</span>')
+    .replace(/^(\s*)([A-Za-z_][A-Za-z0-9_]*)\s*\(\)/gm,'$1<span class="sh-function">$2</span>()');
+}
+
+async function toggleSource(){
+  if(!selected)return;
+
+  if(viewingSource){
+    hideSource();
+    return;
+  }
+
+  let sourcePath=null;
+  let isRemote=false;
+  let remoteUrl=null;
+
+  if(selected.isGithub){
+    isRemote=true;
+    remoteUrl=selected.rawUrl;
+  }else if(selected.path){
+    sourcePath=selected.path;
+  }else{
+    return;
+  }
+
+  $('consoleTitle').textContent='Loading source...';
+
+  try{
+    let content='';
+    if(isRemote&&remoteUrl){
+      const resp=await fetch(remoteUrl);
+      if(!resp.ok)throw new Error('Failed to fetch from GitHub');
+      content=await resp.text();
+    }else{
+      const resp=await fetch('/cgi-bin/api.sh?action=view_source&path='+encodeURIComponent(sourcePath));
+      const data=await resp.json();
+      if(data.error)throw new Error(data.error);
+      content=data.content.replace(/\\n/g,'\n').replace(/\\t/g,'\t').replace(/\\"/g,'"').replace(/\\\\/g,'\\');
+    }
+
+    const lines=content.split('\n');
+    let html='<table>';
+    for(let i=0;i<lines.length;i++){
+      const lineNum=i+1;
+      const highlighted=highlightSh(lines[i]);
+      html+='<tr><td class="line-num">'+lineNum+'</td><td class="line-code">'+highlighted+'</td></tr>';
+    }
+    html+='</table>';
+
+    $('sourceViewer').innerHTML=html;
+    $('sourceViewer').style.display='';
+    $('console').style.display='none';
+    $('consoleTitle').textContent='Source: '+(selected.name||selected.title||'payload.sh');
+    viewingSource=true;
+
+    const btn=$('sourceBtnText');
+    if(btn)btn.textContent='Hide Source';
+  }catch(e){
+    $('consoleTitle').textContent='Nautilus Console';
+    const line=document.createElement('div');
+    line.className='line red';
+    line.textContent='[Source] Error: '+e.message;
+    $('console').appendChild(line);
+    lineCount++;
+    $('lineCount').textContent=lineCount+' lines';
+  }
+}
+
+async function deletePayload(){
+  if(!selected||!selected.path)return;
+  if(selected.path.includes('/remote_access/nautilus/'))return;
+
+  $('modalTitle').textContent='Delete Payload?';
+  $('modalMessage').innerHTML='Are you sure you want to <strong>permanently delete</strong> this payload?<br><br><code>'+escHtml(selected.name)+'</code><br><br>This cannot be undone.';
+  $('modalInput').style.display='none';
+  $('modalConfirm').textContent='Yes, Delete';
+  $('modalCancel').textContent='Cancel';
+  $('modalCancel').style.display='';
+  $('modalTitle').style.color='#ff6b6b';
+  $('modalOverlay').classList.add('show');
+
+  $('modalConfirm').onclick=async()=>{
+    $('modalOverlay').classList.remove('show');
+    $('modalConfirm').onclick=()=>respondPrompt(true);
+    $('modalCancel').onclick=()=>respondPrompt(false);
+
+    try{
+      const resp=await fetch('/cgi-bin/api.sh?action=delete_payload&path='+encodeURIComponent(selected.path));
+      const data=await resp.json();
+      if(data.error){
+        const line=document.createElement('div');
+        line.className='line red';
+        line.textContent='[Delete] Error: '+data.error;
+        $('console').appendChild(line);
+      }else{
+        const line=document.createElement('div');
+        line.className='line green';
+        line.textContent='[Delete] Payload deleted successfully';
+        $('console').appendChild(line);
+        lineCount++;
+        $('lineCount').textContent=lineCount+' lines';
+        const listResp=await fetch('/cgi-bin/api.sh?action=list');
+        const listData=await listResp.json();
+        payloads=listData;
+        filtered=payloads;
+        render();
+        $('detail').innerHTML='<div class="empty">Select a payload</div>';
+        selected=null;
+      }
+    }catch(e){
+      const line=document.createElement('div');
+      line.className='line red';
+      line.textContent='[Delete] Failed: '+e.message;
+      $('console').appendChild(line);
+    }
+  };
+  $('modalCancel').onclick=()=>{
+    $('modalOverlay').classList.remove('show');
+    $('modalCancel').onclick=()=>respondPrompt(false);
+  };
+}
+
 async function run(){
   if(!selected)return;
   if(running){stop();return;}
+  hideSource();
   running=true;runningSection='local';lineCount=0;
   updateRunBtn();
   $('console').innerHTML='';
@@ -1774,12 +1997,16 @@ function hideSpinner(){
 
 function updateRunBtn(){
   const btn=$('runBtn');
+  const txt=$('runBtnText');
   if(!btn)return;
+  const svg=btn.querySelector('svg path');
   if(running){
-    btn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>Stop';
+    if(svg)svg.setAttribute('d','M6 6h12v12H6z');
+    if(txt)txt.textContent='Stop';
     btn.classList.add('stop');
   }else{
-    btn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Run Payload';
+    if(svg)svg.setAttribute('d','M8 5v14l11-7z');
+    if(txt)txt.textContent=selected&&selected.isGithub?'Run from GitHub':'Run Payload';
     btn.classList.remove('stop');
   }
 }
@@ -1828,7 +2055,7 @@ function clearConsole(){
 
 let currentPromptType='confirm';
 let currentPromptDefault='';
-const promptTitles={confirm:'Confirm',text:'Enter Text',number:'Enter Number',ip:'Enter IP Address',mac:'Enter MAC Address',alert:'Alert',error:'Error'};
+const promptTitles={confirm:'Confirm',text:'Enter Text',number:'Enter Number',ip:'Enter IP Address',mac:'Enter MAC Address',alert:'Alert',error:'Error',prompt:''};
 const promptPatterns={
   ip:/^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/,
   mac:/^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/
@@ -1838,18 +2065,18 @@ const promptPlaceholders={text:'Enter text...',number:'0',ip:'192.168.1.1',mac:'
 function showPrompt(type,message,defaultVal){
   currentPromptType=type;
   currentPromptDefault=defaultVal||'';
-  $('modalTitle').textContent=promptTitles[type]||'Input';
+  $('modalTitle').textContent=type in promptTitles?promptTitles[type]:'Input';
   const msgHtml=escHtml(message.replace(/\\n/g,'\n')).replace(/\n/g,'<br>');
   $('modalMessage').innerHTML=msgHtml;
   const inp=$('modalInput');
   const confirmBtn=$('modalConfirm');
   const cancelBtn=$('modalCancel');
 
-  if(type==='alert'||type==='error'){
+  if(type==='alert'||type==='error'||type==='prompt'){
     inp.style.display='none';
     confirmBtn.textContent='OK';
     cancelBtn.style.display='none';
-    $('modalTitle').style.color=type==='error'?'#ff6b6b':'#ffd93d';
+    $('modalTitle').style.color=type==='error'?'#ff6b6b':type==='alert'?'#ffd93d':'';
   }else if(type==='confirm'){
     inp.style.display='none';
     confirmBtn.textContent='Yes';
@@ -1862,8 +2089,7 @@ function showPrompt(type,message,defaultVal){
     inp.placeholder=promptPlaceholders[type]||'';
     inp.value=currentPromptDefault;
     confirmBtn.textContent='Submit';
-    cancelBtn.textContent='Cancel';
-    cancelBtn.style.display='';
+    cancelBtn.style.display='none';
     $('modalTitle').style.color='';
     inp.oninput=()=>validatePromptInput();
     setTimeout(()=>{inp.focus();inp.select();},100);
@@ -1899,8 +2125,8 @@ async function respondPrompt(confirmed){
   const inp=$('modalInput');
   let response='';
 
-  if(currentPromptType==='confirm'){
-    response=confirmed?'1':'0';
+  if(currentPromptType==='confirm'||currentPromptType==='prompt'){
+    response='1';
   }else if(!confirmed){
     response=currentPromptDefault;
   }else{
@@ -1923,7 +2149,7 @@ async function respondPrompt(confirmed){
   $('modalOverlay').classList.remove('show');
   const line=document.createElement('div');
   line.className='line '+(confirmed?'green':'yellow');
-  line.textContent='[v] '+(currentPromptType==='confirm'?(confirmed?'Yes':'No'):response);
+  line.textContent='[v] '+(currentPromptType==='confirm'?(confirmed?'Yes':'No'):currentPromptType==='prompt'?'OK':response);
   $('console').appendChild(line);
   $('console').scrollTop=$('console').scrollHeight;
   await fetch('/cgi-bin/api.sh?action=respond&response='+encodeURIComponent(response)).catch(()=>{});

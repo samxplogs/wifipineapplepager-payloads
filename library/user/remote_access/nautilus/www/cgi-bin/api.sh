@@ -60,15 +60,21 @@ verify_auth() {
         exit 1
     fi
 
+    if [ ${#encrypted_hex} -gt 256 ]; then
+        echo "Content-Type: application/json"
+        echo ""
+        echo '{"error":"Password too long"}'
+        exit 1
+    fi
+
     local password=""
     local i=0
     local len=${#encrypted_hex}
+    local key_len=${#key_hex}
     while [ $i -lt $len ]; do
-        local enc_byte=$(echo "$encrypted_hex" | cut -c$((i+1))-$((i+2)))
-        local key_byte=$(echo "$key_hex" | cut -c$((i+1))-$((i+2)))
-        if [ -z "$key_byte" ]; then
-            key_byte="00"
-        fi
+        local enc_byte=$(expr substr "$encrypted_hex" $((i + 1)) 2)
+        local key_pos=$(( (i % key_len) + 1 ))
+        local key_byte=$(expr substr "$key_hex" $key_pos 2)
         local dec_byte=$(printf '%02x' $((0x$enc_byte ^ 0x$key_byte)))
         password="${password}$(printf "\\x${dec_byte}")"
         i=$((i + 2))
@@ -222,6 +228,109 @@ list_payloads() {
     fi
 }
 
+delete_payload() {
+    local payload_path="$1"
+
+    case "$payload_path" in
+        *..*)
+            echo "Content-Type: application/json"
+            echo ""
+            echo '{"error":"Security: Path traversal not allowed"}'
+            exit 1
+            ;;
+    esac
+
+    case "$payload_path" in
+        /root/payloads/user/*) ;;
+        *)
+            echo "Content-Type: application/json"
+            echo ""
+            echo '{"error":"Invalid path: must be in /root/payloads/user/"}'
+            exit 1
+            ;;
+    esac
+
+    case "$payload_path" in
+        */payload.sh) ;;
+        *)
+            echo "Content-Type: application/json"
+            echo ""
+            echo '{"error":"Invalid payload file"}'
+            exit 1
+            ;;
+    esac
+
+    local payload_dir=$(dirname "$payload_path")
+
+    if [ "$payload_dir" = "/root/payloads/user/remote_access/nautilus" ]; then
+        echo "Content-Type: application/json"
+        echo ""
+        echo '{"error":"Cannot delete Nautilus"}'
+        exit 1
+    fi
+
+    if [ ! -d "$payload_dir" ]; then
+        echo "Content-Type: application/json"
+        echo ""
+        echo '{"error":"Payload not found"}'
+        exit 1
+    fi
+
+    rm -rf "$payload_dir"
+
+    /root/payloads/user/remote_access/nautilus/build_cache.sh >/dev/null 2>&1
+
+    echo "Content-Type: application/json"
+    echo ""
+    echo '{"status":"deleted","path":"'"$payload_dir"'"}'
+}
+
+view_source() {
+    local payload_path="$1"
+
+    case "$payload_path" in
+        *..*)
+            echo "Content-Type: application/json"
+            echo ""
+            echo '{"error":"Security: Path traversal not allowed"}'
+            exit 1
+            ;;
+    esac
+
+    case "$payload_path" in
+        /root/payloads/user/*) ;;
+        *)
+            echo "Content-Type: application/json"
+            echo ""
+            echo '{"error":"Invalid path: must be in /root/payloads/user/"}'
+            exit 1
+            ;;
+    esac
+
+    case "$payload_path" in
+        */payload.sh) ;;
+        *)
+            echo "Content-Type: application/json"
+            echo ""
+            echo '{"error":"Invalid payload file"}'
+            exit 1
+            ;;
+    esac
+
+    if [ ! -f "$payload_path" ]; then
+        echo "Content-Type: application/json"
+        echo ""
+        echo '{"error":"Payload not found"}'
+        exit 1
+    fi
+
+    echo "Content-Type: application/json"
+    echo ""
+
+    local content=$(cat "$payload_path" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | awk '{printf "%s\\n", $0}')
+    echo "{\"content\":\"$content\",\"path\":\"$payload_path\"}"
+}
+
 run_payload() {
     rpath="$1"
     token="$2"
@@ -267,7 +376,6 @@ _nautilus_emit() {
     local color="$1"
     shift
     local text="$*"
-    # Output for web console
     if [ -n "$color" ]; then
         echo "[${color}] ${text}"
     else
@@ -286,14 +394,12 @@ LOG() {
 }
 
 ALERT() {
-    # Display in Nautilus only - don't pop up on pager
     echo "[PROMPT:alert] $*" >&2
     sleep 0.1
     _wait_response ""
 }
 
 ERROR_DIALOG() {
-    # Display in Nautilus only - don't pop up on pager
     echo "[PROMPT:error] $*" >&2
     sleep 0.1
     _wait_response ""
@@ -335,7 +441,7 @@ CONFIRMATION_DIALOG() {
 
 PROMPT() {
     local msg="$*"
-    echo "[PROMPT:text] $msg" >&2
+    echo "[PROMPT:prompt] $msg" >&2
     _wait_response ""
 }
 
@@ -367,7 +473,6 @@ MAC_PICKER() {
     _wait_response "$default"
 }
 
-# Spinner functions - intercept and show in Nautilus UI instead of pager
 SPINNER() {
     echo "[SPINNER:start] $*" >&2
 }
@@ -879,6 +984,15 @@ install_github() {
             ;;
     esac
 
+    case "$github_url" in
+        *..* | *%2e%2e* | *%2E%2E* | *%2e%2E* | *%2E%2e*)
+            echo "Content-Type: text/plain"
+            echo ""
+            echo "Security: Path traversal not allowed"
+            exit 1
+            ;;
+    esac
+
     [ -f "$PID_FILE" ] && { kill $(cat "$PID_FILE") 2>/dev/null; rm -f "$PID_FILE"; }
 
     url_path="${github_url#https://raw.githubusercontent.com/}"
@@ -1086,6 +1200,15 @@ install_pr() {
             echo "Content-Type: text/plain"
             echo ""
             echo "Security: Only wifipineapplepager-payloads repos allowed"
+            exit 1
+            ;;
+    esac
+
+    case "$github_url" in
+        *..* | *%2e%2e* | *%2E%2E* | *%2e%2E* | *%2E%2e*)
+            echo "Content-Type: text/plain"
+            echo ""
+            echo "Security: Path traversal not allowed"
             exit 1
             ;;
     esac
@@ -1299,6 +1422,15 @@ run_github() {
             ;;
     esac
 
+    case "$github_url" in
+        *..* | *%2e%2e* | *%2E%2E* | *%2e%2E* | *%2E%2e*)
+            echo "Content-Type: text/plain"
+            echo ""
+            echo "Security: Path traversal not allowed"
+            exit 1
+            ;;
+    esac
+
     [ -f "$PID_FILE" ] && { kill $(cat "$PID_FILE") 2>/dev/null; rm -f "$PID_FILE"; }
 
     url_path="${github_url#https://raw.githubusercontent.com/}"
@@ -1492,7 +1624,6 @@ ERROR_DIALOG() {
     _wait_response ""
 }
 
-# Spinner functions - intercept and show in Nautilus UI
 SPINNER() {
     echo "[SPINNER:start] $*" >&2
 }
@@ -1573,7 +1704,7 @@ MAC_PICKER() {
 }
 
 PROMPT() {
-    echo "[PROMPT:text:] $1" >&2
+    echo "[PROMPT:prompt] $1" >&2
     sleep 0.1
     _wait_response ""
 }
@@ -1745,6 +1876,8 @@ case "$action" in
     install_pr) require_auth; install_pr "$github_url" "$token" "$force" "$pr_path" ;;
     check_local) require_auth; check_local_exists "$github_path" ;;
     stop) require_auth; stop_payload ;;
+    delete_payload) require_auth; delete_payload "$rpath" ;;
+    view_source) require_auth; view_source "$rpath" ;;
     respond) require_auth; respond "$response" ;;
     refresh) require_auth; /root/payloads/user/remote_access/nautilus/build_cache.sh; echo "Content-Type: application/json"; echo ""; echo '{"status":"refreshed"}' ;;
     wifi_status) require_auth; wifi_status ;;

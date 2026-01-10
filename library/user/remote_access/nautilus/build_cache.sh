@@ -12,20 +12,17 @@ awk '
 BEGIN { ORS="" }
 {
     file = $0
-    # Extract category from path: /root/payloads/user/CATEGORY/name/payload.sh
     n = split(file, parts, "/")
     if (n < 3) next
     category = parts[n-2]
     pname = parts[n-1]
 
-    # Skip special dirs
     if (pname ~ /^DISABLED\./ || pname == "PLACEHOLDER" || pname == "nautilus") next
 
     title = ""; desc = ""; author = ""
     linenum = 0
     while ((getline line < file) > 0 && linenum < 20) {
         linenum++
-        # BusyBox awk compatible - use sub to extract after colon
         if (line ~ /^# *Title:/) {
             sub(/^# *Title: */, "", line)
             title = line
@@ -42,12 +39,10 @@ BEGIN { ORS="" }
 
     if (title == "") title = pname
 
-    # JSON escape - remove control chars (tab, newline, carriage return) and escape quotes
     gsub(/[\t\r\n]/, " ", title); gsub(/\\/, "\\\\", title); gsub(/"/, "\\\"", title)
     gsub(/[\t\r\n]/, " ", desc); gsub(/\\/, "\\\\", desc); gsub(/"/, "\\\"", desc)
     gsub(/[\t\r\n]/, " ", author); gsub(/\\/, "\\\\", author); gsub(/"/, "\\\"", author)
 
-    # Store in category array
     entry = "{\"name\":\"" title "\",\"desc\":\"" desc "\",\"author\":\"" author "\",\"path\":\"" file "\"}"
     if (category in cats) {
         cats[category] = cats[category] "," entry
