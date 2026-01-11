@@ -2,7 +2,7 @@
 # Title: Hashtopolis Handshake Upload
 # Description: Manually uploads all captured handshakes to Hashtopolis server via API
 # Author: Originaly Hunt-Z modified by TheDadNerd
-# Version: 2.0
+# Version: 2.1
 # Category: general
 #
 # Requirements:
@@ -38,15 +38,15 @@ get_payload_config() {
 
 load_payload_config() {
     # Pull the saved payload config into the runtime environment.
-    HASHTOPOLIS_URL="$(get_payload_config "hashtopolis_url")"
-    API_KEY="$(get_payload_config "api_key")"
-    HASH_TYPE="$(get_payload_config "hash_type")"
-    ACCESS_GROUP_ID="$(get_payload_config "access_group_id")"
-    SECRET_HASHLIST="$(get_payload_config "secret_hashlist")"
-    USE_BRAIN="$(get_payload_config "use_brain")"
-    BRAIN_FEATURES="$(get_payload_config "brain_features")"
-    PRETASK_ID="$(get_payload_config "pretask_id")"
-    CRACKER_VERSION_ID="$(get_payload_config "cracker_version_id")"
+    HASHTOPOLIS_URL="$(get_payload_config hashtopolisurl)"
+    API_KEY="$(get_payload_config apikey)"
+    HASH_TYPE="$(get_payload_config hashtype)"
+    ACCESS_GROUP_ID="$(get_payload_config accessgroupid)"
+    SECRET_HASHLIST="$(get_payload_config secrethashlist)"
+    USE_BRAIN="$(get_payload_config usebrain)"
+    BRAIN_FEATURES="$(get_payload_config brainfeatures)"
+    PRETASK_ID="$(get_payload_config pretaskid)"
+    CRACKER_VERSION_ID="$(get_payload_config crackerversionid)"
 
     if [[ -z "$HASHTOPOLIS_URL" \
         || -z "$API_KEY" \
@@ -65,15 +65,15 @@ load_payload_config() {
 
 read_saved_config() {
     # Load saved payload config into SAVED_* variables for comparison.
-    SAVED_HASHTOPOLIS_URL="$(get_payload_config "hashtopolis_url")"
-    SAVED_API_KEY="$(get_payload_config "api_key")"
-    SAVED_HASH_TYPE="$(get_payload_config "hash_type")"
-    SAVED_ACCESS_GROUP_ID="$(get_payload_config "access_group_id")"
-    SAVED_SECRET_HASHLIST="$(get_payload_config "secret_hashlist")"
-    SAVED_USE_BRAIN="$(get_payload_config "use_brain")"
-    SAVED_BRAIN_FEATURES="$(get_payload_config "brain_features")"
-    SAVED_PRETASK_ID="$(get_payload_config "pretask_id")"
-    SAVED_CRACKER_VERSION_ID="$(get_payload_config "cracker_version_id")"
+    SAVED_HASHTOPOLIS_URL="$(get_payload_config hashtopolisurl)"
+    SAVED_API_KEY="$(get_payload_config apikey)"
+    SAVED_HASH_TYPE="$(get_payload_config hashtype)"
+    SAVED_ACCESS_GROUP_ID="$(get_payload_config accessgroupid)"
+    SAVED_SECRET_HASHLIST="$(get_payload_config secrethashlist)"
+    SAVED_USE_BRAIN="$(get_payload_config usebrain)"
+    SAVED_BRAIN_FEATURES="$(get_payload_config brainfeatures)"
+    SAVED_PRETASK_ID="$(get_payload_config pretaskid)"
+    SAVED_CRACKER_VERSION_ID="$(get_payload_config crackerversionid)"
 
     if [[ -z "$SAVED_HASHTOPOLIS_URL" \
         || -z "$SAVED_API_KEY" \
@@ -243,6 +243,15 @@ if ! load_payload_config; then
         if ! warn_if_sample_config; then
             exit 1
         fi
+        HASHTOPOLIS_URL="$CFG_HASHTOPOLIS_URL"
+        API_KEY="$CFG_API_KEY"
+        HASH_TYPE="$CFG_HASH_TYPE"
+        ACCESS_GROUP_ID="$CFG_ACCESS_GROUP_ID"
+        SECRET_HASHLIST="$CFG_SECRET_HASHLIST"
+        USE_BRAIN="$CFG_USE_BRAIN"
+        BRAIN_FEATURES="$CFG_BRAIN_FEATURES"
+        PRETASK_ID="$CFG_PRETASK_ID"
+        CRACKER_VERSION_ID="$CFG_CRACKER_VERSION_ID"
         if ! push_payload_config; then
             ERROR_DIALOG "Hashtopolis Upload - Failed to store config from config.sh. Check values."
             exit 1

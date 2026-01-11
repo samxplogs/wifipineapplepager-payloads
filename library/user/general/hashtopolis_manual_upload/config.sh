@@ -74,46 +74,15 @@ export CRACKER_VERSION_ID=1
 # Call push_payload_config from the payload when you want to persist settings.
 
 push_payload_config() {
-    local missing=0
-
-    if [[ -z "$HASHTOPOLIS_URL" || "$HASHTOPOLIS_URL" == *"example.com"* ]]; then
-        echo "ERROR: HASHTOPOLIS_URL is not set in config.sh" >&2
-        missing=1
-    fi
-
-    if [[ -z "$API_KEY" || "$API_KEY" == "YOUR_API_KEY_HERE" ]]; then
-        echo "ERROR: API_KEY is not set in config.sh" >&2
-        missing=1
-    fi
-
-    if [[ -z "$PRETASK_ID" ]]; then
-        echo "ERROR: PRETASK_ID is not set in config.sh" >&2
-        missing=1
-    fi
-
-    if [[ -z "$CRACKER_VERSION_ID" ]]; then
-        echo "ERROR: CRACKER_VERSION_ID is not set in config.sh" >&2
-        missing=1
-    fi
-
-    if [[ "$missing" -ne 0 ]]; then
-        return 1
-    fi
-
-    if ! type PAYLOAD_SET_CONFIG >/dev/null 2>&1; then
-        echo "ERROR: PAYLOAD_SET_CONFIG is not available in this environment." >&2
-        return 1
-    fi
-
     : "${PAYLOAD_NAME:=hashtopolis_manual_upload}"
 
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "hashtopolis_url" "$HASHTOPOLIS_URL"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "api_key" "$API_KEY"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "hash_type" "$HASH_TYPE"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "access_group_id" "$ACCESS_GROUP_ID"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "secret_hashlist" "$SECRET_HASHLIST"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "use_brain" "$USE_BRAIN"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "brain_features" "$BRAIN_FEATURES"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "pretask_id" "$PRETASK_ID"
-    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" "cracker_version_id" "$CRACKER_VERSION_ID"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" hashtopolisurl "$HASHTOPOLIS_URL"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" apikey "$API_KEY"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" hashtype "$HASH_TYPE"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" accessgroupid "$ACCESS_GROUP_ID"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" secrethashlist "$SECRET_HASHLIST"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" usebrain "$USE_BRAIN"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" brainfeatures "$BRAIN_FEATURES"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" pretaskid "$PRETASK_ID"
+    PAYLOAD_SET_CONFIG "$PAYLOAD_NAME" crackerversionid "$CRACKER_VERSION_ID"
 }
