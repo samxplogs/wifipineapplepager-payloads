@@ -1,106 +1,305 @@
-# Digital Tails — Persistent Device Tracker  
-#Author - Notorious Squirrel
-**Hak5 WiFi Pineapple Pager**
+📡 Digital Tails – v2
 
-Digital Tails is a passive, wardriver-style awareness payload for the WiFi Pineapple Pager.  
-Its purpose is to highlight devices that remain persistently nearby over time, which may indicate that a device (and potentially its owner) is staying close to you (tailing you).
+Persistent Device Detection Payload
 
-⚠️ This is not a tracking or surveillance tool — it does not follow people, inject packets, deauthenticate, or associate with networks.  
-It simply analyses existing recon data collected by the Pineapple.
+If Recon tells you what is around you,
+Digital Tails tells you what is staying.
 
----
+Overview
 
-- What Digital Tails does
+Digital Tails is a passive Wi-Fi awareness payload designed to identify devices that appear to be persistently present near you over time, potentially indicating that a device is following, co-moving, or repeatedly appearing in your immediate area.
 
-- Reads client device data from `recon.db`
-- Tracks how often a device appears across repeated scans
-- Highlights devices that:
-  - stay nearby for long periods
-  - remain close (strong RSSI)
-- Displays the most persistent devices on the Pager screen
+It does not capture handshakes, deauth, inject traffic, or interact with networks in any way.
 
-This is useful for:
-- situational awareness while walking or travelling
-- spotting unusually persistent nearby devices
-- learning how noisy or stable an RF environment is
+Digital Tails works entirely from Recon’s passive scan data and is therefore:
 
----
+Low noise
 
-# How it works 
+Low risk
 
-1. Recon data source
-   - Reads from:
-     ```
-     /mmc/root/recon/recon.db
-     ```
-   - Uses the `wifi_device` table
+Continuous
 
-2. Seen list
-   - Builds a list of devices seen in the most recent DB rows
-   - Stored as:
-     ```
-     /tmp/digital_tails/seen.psv
-     ```
+Suitable for walking or driving
 
-3. Rolling history
-   - Each device is tracked using a rolling bit window
-   - Example:
-     ```
-     011011101101
-     ```
-   - `1` = seen this scan  
-   - `0` = not seen
+Version 2 builds on the original concept by adding temporal intelligence and signal strength context, making results significantly more meaningful and actionable.
 
-4. Persistence calculation
-   - Counts how many `1`s appear in the window
-   - This becomes the **persistence score**
+What Digital Tails Does (In Plain English)
 
-5. Sorting
-   - Devices are ranked by:
-     1. Persistence count
-     2. RSSI strength
+Digital Tails:
 
-6. Display
-   - Top devices are shown on screen with:
-     - short MAC
-     - persistence score
-     - RSSI
-     - signal bar
+Reads recent Wi-Fi device sightings from recon.db
 
----
+Tracks how often the same MAC address appears
 
- Screen output explained 
+Observes signal strength consistency
 
-Example: !! 56:78:9A:BC seen:9/12 rssi:-52 #######
+Highlights devices that:
+
+Appear repeatedly
+
+Remain nearby
+
+Do so across multiple scans
+
+The goal is pattern detection, not identification.
+
+Key Concepts
+Persistence
+
+A device that appears in many consecutive scans is more interesting than one that appears once.
+
+Signal Strength
+
+A strong or stable RSSI suggests physical proximity, not just background noise.
+
+Time Window
+
+Digital Tails does not rely on a single scan. It uses a sliding time window to build context.
+
+Version Differences (v1 vs v2)
+🔹 Digital Tails v1
+
+Baseline visibility
+
+Reads MAC + RSSI from Recon
+
+Displays most recently seen devices
+
+No memory beyond the current scan
+
+No persistence scoring
+
+Useful for:
+
+Spot-checking nearby devices
+
+Confirming Recon is working
+
+Limitations
+
+No way to tell if a device is “sticking around”
+
+No prioritisation
+
+No historical context
+
+🔹 Digital Tails v2 (Current)
+
+Behaviour-based detection
+
+v2 introduces state, memory, and logic.
+
+New Capabilities
+
+Sliding scan window
+
+Per-device persistence tracking
+
+Rolling bitmask history
+
+Strong-signal correlation
+
+Priority flagging
+
+Pager-friendly visual output
+
+This transforms Digital Tails from a viewer into a detector.
+
+How Digital Tails v2 Works (Logic Flow)
+1️⃣ Data Source
+
+Digital Tails reads from:
+
+/mmc/root/recon/recon.db
 
 
- Symbols
-- `!!`  
-  Persistent **and** strong signal (likely close)
-- `! `  
-  Persistent but weaker signal
-- (blank)  
-  Not persistent enough yet
+Specifically:
 
- Fields
-- `56:78:9A:BC`  
-  Shortened MAC (last 4 bytes)
-- `seen:9/12`  
-  Seen in 9 of the last 12 scans
-- `rssi:-52`  
-  Signal strength (higher = closer)
-- `#######`  
-  Visual signal bar
+wifi_device.mac
 
----
+wifi_device.signal
 
- Configuration 
+No packets are captured directly by Digital Tails.
 
-```bash
-SCAN_INTERVAL=5        # seconds between scans
-WINDOW_SCANS=12        # history window (~60 seconds)
-PERSIST_MIN=7          # minimum seen count to flag
-STRONG_RSSI=-55        # close proximity threshold
-MAX_SHOW=8             # max devices shown
-SAMPLE_ROWS=2500       # DB rows sampled each loop
+2️⃣ Scan Window
+
+Each device is tracked across a rolling window:
+
+Setting	Default
+Scan interval	5 seconds
+Window size	12 scans
+Time covered	~60 seconds
+
+Every scan shifts the window forward.
+
+3️⃣ Bitmask Tracking (Core Logic)
+
+Each MAC address is represented internally like this:
+
+MAC | 010111011101 | RSSI
+
+
+Where:
+
+1 = device seen in that scan
+
+0 = device not seen
+
+Length = window size
+
+This allows Digital Tails to answer:
+
+“How often has this device appeared recently?”
+
+Note:
+No long-term storage — this is short-term situational awareness.
+
+4️⃣ Persistence Scoring
+
+The number of 1s in the bitmask = persistence score
+
+Example:
+
+010111011101 → 8 / 12
+
+
+This means the device appeared in:
+
+8 of the last 12 scans
+
+5️⃣ Signal Strength Correlation
+
+RSSI is used to distinguish:
+
+Nearby devices
+
+Passing/background devices
+
+Default threshold:
+
+STRONG_RSSI = -55 dBm
+
+What Is Displayed on Screen
+
+Each visible line represents one device.
+
+Example output:
+
+!! 9A:FD:71:C8  seen:9/12  rssi:-48  #######
+
+How to Read the Display
+Flags
+Symbol	Meaning
+!!	Persistent and strong signal (high interest)
+!	Persistent but weaker signal
+	Normal background device
+MAC Address
+
+Only the last 4 octets are shown to:
+
+Save screen space
+
+Improve readability
+
+Reduce unnecessary exposure
+
+Full MACs remain available in Recon.
+
+Seen Count
+seen:9/12
+
+
+Means:
+
+Device appeared in 9 of the last 12 scans
+
+High likelihood of physical proximity or co-movement
+
+RSSI
+rssi:-48
+
+
+Lower absolute value = stronger signal
+(-48 is much closer than -78)
+
+Signal Bars
+
+Visual strength indicator:
+
+#######
+
+
+Quick at-a-glance proximity estimation.
+
+Typical Interpretation Scenarios
+Walking
+
+Background MACs flicker (low seen count)
+
+Devices moving with you rise to the top
+
+Your own phone will often show as !! (future whitelist feature)
+
+Driving
+
+Passing APs appear briefly
+
+Vehicles with onboard Wi-Fi may persist
+
+Strong + persistent devices are rare and notable
+
+Static Position
+
+Home devices stabilise
+
+Persistent external devices stand out clearly
+
+What Digital Tails Does NOT Do
+
+❌ Identify owners
+
+❌ Decrypt traffic
+
+❌ Track across reboots
+
+❌ Store long-term history
+
+❌ Perform active attacks
+
+It is situational awareness, not surveillance.
+
+Why Digital Tails v2 Is Better
+Area	v1	v2
+Persistence	❌	✅
+Signal context	❌	✅
+Noise reduction	❌	✅
+Meaningful alerts	❌	✅
+Walking / driving usable	⚠️	✅
+Pager-friendly	⚠️	✅
+Best Practices
+
+Let it run continuously
+
+Watch changes, not just flags
+
+Combine with Recon for full visibility
+
+Expect your own devices to appear (whitelist is next)
+
+Future Development (Planned)
+
+MAC whitelisting
+
+Target alert companion payload
+
+Bluetooth device correlation
+
+Location fingerprinting
+
+Multi-session persistence
+
+Summary
+
+Digital Tails v2 turns passive Wi-Fi noise into behavioural insight.
+
 
