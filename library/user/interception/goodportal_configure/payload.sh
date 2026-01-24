@@ -3,7 +3,7 @@
 # Description: Configure and start captive portal on lan interfaces
 # Purpose: Display educational captive portal page with no additional configuration
 # Author: spencershepard (GRIMM)
-# Version: 1.2
+# Version: 1.3
 
 # IMPORTANT!  As of Pager Firware 1.0.4 the opkg source list is broken with a missing repository.  
 # To fix, comment out or remove the offending line (Hak5) in /etc/opkg/distfeeds.conf before installing packages.
