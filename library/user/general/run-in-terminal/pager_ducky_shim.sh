@@ -23,12 +23,21 @@ CONFIRMATION_DIALOG() {
     while true; do
         read -p "$* [y/N]: " yn
         case "$yn" in
-            [Yy]* ) return 0 ;;   # yes → 0
-            [Nn]*|"" ) return 1 ;; # no → 1
-            * ) echo "Please answer yes (y) or no (n)." ;;
+            [Yy]* )
+                echo 0
+                return 0
+                ;;
+            [Nn]*|"" )
+                echo 1
+                return 1
+                ;;
+            * )
+                echo "Please answer yes (y) or no (n)."
+                ;;
         esac
     done
 }
+
 
 # ---------- INPUT ----------
 TEXT_PICKER() {
@@ -72,4 +81,4 @@ STOP_SPINNER() {
 export -f LOG ALERT ERROR_DIALOG PROMPT CONFIRMATION_DIALOG
 export -f TEXT_PICKER NUMBER_PICKER IP_PICKER MAC_PICKER
 export -f WAIT_FOR_BUTTON_PRESS WAIT_FOR_INPUT
-export -f START_SPINNER STOP_SPINNER VIBRATE RINGTONE
+export -f START_SPINNER STOP_SPINNER
