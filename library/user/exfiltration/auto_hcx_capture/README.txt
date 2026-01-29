@@ -19,7 +19,8 @@ Verify tools are installed:
 command: hcxdumptool --version
 
 command: hcxpcapngtool --version
- 
+
+Updated changes Janary 29th. It should auto install all the tools reqired now. 
 
 Disclaimer: This is for educational purposes only!!
 
